@@ -18,3 +18,12 @@
 - 实现了图片上传、模型推理、结果展示的完整流程。
 - 测试截图：终端成功识别出 2 persons, 1 cell phone。
 - 至此，“任务二 YOLO” 全部完成。
+## 2026-10-02
+- 大模型部署：尝试 `ollama pull` 官方源下载，速度仅 18KB/s（预计耗时3小时），果断放弃。
+- 解决方案：改用魔搭社区（ModelScope）命令行工具 `modelscope download` 下载 GGUF 格式模型（速度 3.6MB/s，耗时23分钟）。
+- 踩坑记录：导入分片 GGUF 模型时，`ollama create` 报错 `invalid split GGUF`。通过修改 `Modelfile` 中的路径为通配符 `*`（如 `qwen2.5-7b-instruct-q4_k_m-*.gguf`），成功让 Ollama 自动合并分片。
+- 最终结果：成功在本地运行 Qwen2.5-7B 模型，实现离线对话。
+## 2026-10-02 (下午)
+- 智能体开发完成，成功实现了多轮对话和上下文记忆。
+- 踩坑记录：起初使用 `stream=False` 进行非流式请求，由于纯 CPU 环境运行 7B 模型（速度约 2-5 token/s），生成较长代码时界面长时间无反应，产生“卡死”错觉。
+- 解决方案：将请求改为 `stream=True`，利用 requests 的流式读取和 `flush=True` 实现逐字输出，大幅提升交互体验，并成功生成了完整的 YOLO 检测代码。
