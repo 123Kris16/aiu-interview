@@ -6,7 +6,6 @@ import json
 import os
 import sys
 
-# 将项目根目录加入路径，方便导入 llm 模块
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from llm.ollama_service import chat
 
@@ -31,6 +30,7 @@ def save_memory(core_memory, chat_history):
 def summarize_memory(core_memory, chat_history):
     """
     当对话过长时，调用大模型对最近的对话进行总结，更新核心记忆。
+    成功返回新的核心记忆字符串，失败返回 None。
     """
     history_text = "\n".join([f"{m['role']}: {m['content']}" for m in chat_history[-6:]])
     prompt = f"""
@@ -43,4 +43,9 @@ def summarize_memory(core_memory, chat_history):
 
 请直接输出更新后的核心记忆，不要加任何其他解释。
 """
-    return chat([{"role": "user", "content": prompt}]).strip()
+    try:
+        result = chat([{"role": "user", "content": prompt}]).strip()
+        return result if result else None
+    except Exception as e:
+        print(f"总结记忆出错: {e}")
+        return None

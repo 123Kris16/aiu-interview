@@ -11,7 +11,6 @@ from llm.ollama_service import stream_chat
 
 st.set_page_config(page_title="AIU 专属智能体", page_icon="🤖", layout="centered")
 
-# ---------- 自定义 CSS ----------
 st.markdown("""
 <style>
     .stApp {
@@ -68,5 +67,9 @@ if prompt := st.chat_input("请输入你的问题..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     with st.chat_message("assistant"):
-        full_response = st.write_stream(stream_chat(st.session_state.messages))
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        try:
+            full_response = st.write_stream(stream_chat(st.session_state.messages))
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+        except Exception as e:
+            st.error(f"调用大模型失败：{e}")
+            st.session_state.messages.pop()
