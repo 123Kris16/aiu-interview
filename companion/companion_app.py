@@ -11,9 +11,47 @@ from PIL import Image
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from llm.ollama_service import stream_chat
+from llm.tts_service import text_to_speech
 from yolo.yolo_service import YoloService
 from companion.memory_service import load_memory, save_memory, summarize_memory
 
+# ---------- 页面配置 ----------
+st.set_page_config(page_title="专属AI伴侣", page_icon="💖", layout="centered")
+
+# ---------- 自定义 CSS 美化 ----------
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: "Microsoft YaHei", sans-serif;
+    }
+    h1 {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+    [data-testid="stChatMessage"] {
+        background-color: white;
+        border-radius: 16px;
+        padding: 12px 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    [data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-right: 1px solid #e0e0e0;
+    }
+    [data-testid="stChatInput"] textarea {
+        border-radius: 24px;
+        border: 2px solid #667eea;
+        padding: 12px 18px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.title("💖 专属本地 AI 伴侣 (养成版)")
+st.caption("纯本地运行，支持长期记忆、自动总结、图片场景感知、语音朗读。")
 
 # ---------- 初始化服务 ----------
 @st.cache_resource
@@ -21,13 +59,6 @@ def get_yolo():
     return YoloService()
 
 yolo = get_yolo()
-
-
-# ---------- 页面配置 ----------
-st.set_page_config(page_title="专属AI伴侣", page_icon="💖", layout="centered")
-st.title("💖 专属本地 AI 伴侣 (养成版)")
-st.caption("纯本地运行，支持长期记忆、自动总结、图片场景感知。")
-
 
 # ---------- 侧边栏 ----------
 st.sidebar.header("⚙️ 伴侣设定")
@@ -38,7 +69,6 @@ with st.sidebar.expander("📝 基础设定", expanded=True):
         value="你叫小雨，23岁，是一名插画师。你性格温柔、活泼，喜欢猫和咖啡。你说话时偶尔会带一个可爱的语气词。"
     )
     user_desc = st.text_input("你的设定（她怎么称呼你）", value="男神")
-
 
 # ---------- 初始化状态 ----------
 if "memory" not in st.session_state:
@@ -52,12 +82,10 @@ with st.sidebar.expander("🧠 自动进化的核心记忆", expanded=True):
     st.write(st.session_state.memory["core_memory"])
     st.caption("（对话记录超过6条后，AI会自动总结并更新这里）")
 
-
 # ---------- 历史消息 ----------
 for msg in st.session_state.companion_messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
-
 
 # ---------- 图片上传 ----------
 uploaded_file = st.file_uploader("📸 上传一张图片，让她了解你现在的环境...", type=["jpg", "jpeg", "png"])
@@ -72,7 +100,6 @@ if uploaded_file is not None:
         else:
             st.session_state.scenery_context = "你看到了我发的一张照片，但画面没有明显物体。"
             st.warning("没有识别出明显物体。")
-
 
 # ---------- 聊天区域 ----------
 st.divider()
@@ -94,6 +121,12 @@ if prompt := st.chat_input(f"对 {companion_name} 说点什么..."):
         messages = [{"role": "system", "content": system_prompt}] + st.session_state.companion_messages
         full_response = st.write_stream(stream_chat(messages))
         st.session_state.companion_messages.append({"role": "assistant", "content": full_response})
+
+        # 生成语音并播放（缩进已修正）
+        with st.spinner("正在生成语音..."):
+            audio_path = text_to_speech(full_response)
+            if audio_path:
+                st.audio(audio_path, format="audio/mp3", autoplay=True)
 
         # 记忆自动总结
         if len(st.session_state.companion_messages) >= 6:
