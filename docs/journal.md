@@ -55,3 +55,8 @@
 - 为 AI 伴侣接入 edge-tts 文本转语音服务，实现回复后自动播放语音。
 - 创建 llm/tts_service.py，封装语音生成逻辑，保持前后端解耦。
 - 踩坑记录：粘贴代码时出现 IndentationError，通过整体替换文件解决。
+## 2026-10-06 (Issue修复篇)
+- 修复 Issue #1：记忆总结失败时误清空对话记录。在 companion_app.py 中对比新旧核心记忆，只有总结成功时才清空 companion_messages。
+- 修复 Issue #2：Ollama 报错被当成 AI 回复写入历史。将 ollama_service.py 的异常处理改为抛出，前端 try-except 捕获，失败时弹出用户消息，不污染对话历史。
+- 更新 memory_service.py：summarize_memory 失败时返回 None。
+- 提交信息：fix: 修复Ollama报错被当成AI回复的bug，service层失败时抛出异常。
