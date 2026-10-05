@@ -10,6 +10,34 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from llm.ollama_service import stream_chat
 
 st.set_page_config(page_title="AIU 专属智能体", page_icon="🤖", layout="centered")
+
+# ---------- 自定义 CSS ----------
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: "Microsoft YaHei", sans-serif;
+    }
+    h1 {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+    [data-testid="stChatMessage"] {
+        background-color: white;
+        border-radius: 16px;
+        padding: 12px 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    [data-testid="stChatInput"] textarea {
+        border-radius: 24px;
+        border: 2px solid #667eea;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("🤖 AIU 创智部专属智能体")
 st.caption("基于 Ollama + Qwen2.5，纯本地运行。")
 
@@ -20,6 +48,11 @@ if "messages" not in st.session_state:
 
 with st.sidebar:
     st.header("⚙️ 控制面板")
+    st.write("当前模型：Qwen2.5-7B")
+    st.write("运行模式：本地 CPU")
+    st.divider()
+    turn_count = len([m for m in st.session_state.messages if m["role"] == "user"])
+    st.metric("对话轮数", turn_count)
     if st.button("🗑️ 清空对话记录"):
         st.session_state.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         st.rerun()
