@@ -3,21 +3,22 @@
 本模块负责 YOLO 目标检测的训练、推理与模型管理。
 
 ## 内容说明
-- `yolo11n.pt`：YOLO11n 预训练权重。
+- `yolo_service.py`：YOLO 推理服务封装，对外提供 `predict` 接口。
 - `realtime.py`：实时摄像头推理脚本。
+- `yolo11n.pt`：YOLO11n 预训练权重。
 - 训练数据集与输出结果位于项目根目录的 `datasets/` 和 `runs/` 中。
 
 ## 快速开始
 
 ### 1. 实时摄像头推理
 ```bash
-python realtime.py
+python yolo/realtime.py
 ```
 按 `q` 键退出窗口。
 
 ### 2. 重新训练（可选）
 ```bash
-yolo train model=yolo11n.pt data=coco8.yaml epochs=10 imgsz=640
+yolo train model=yolo/yolo11n.pt data=datasets/coco8.yaml epochs=10 imgsz=640
 ```
 
 ## 依赖

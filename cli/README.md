@@ -7,7 +7,7 @@
 
 ## 快速开始
 ```bash
-python agent_cli.py
+python cli/agent_cli.py
 ```
 输入问题即可与智能体对话，输入 `退出` 结束程序。
 

@@ -10,12 +10,12 @@
 
 ### 1. 运行 YOLO 检测网页
 ```bash
-streamlit run app.py
+streamlit run web/app.py
 ```
 
 ### 2. 运行大模型聊天网页
 ```bash
-streamlit run chat_web.py
+streamlit run web/chat_web.py
 ```
 两个应用都会在 `http://localhost:8501` 启动。
 

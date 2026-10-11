@@ -60,3 +60,8 @@
 - 修复 Issue #2：Ollama 报错被当成 AI 回复写入历史。将 ollama_service.py 的异常处理改为抛出，前端 try-except 捕获，失败时弹出用户消息，不污染对话历史。
 - 更新 memory_service.py：summarize_memory 失败时返回 None。
 - 提交信息：fix: 修复Ollama报错被当成AI回复的bug，service层失败时抛出异常。
+## 2026-10-11 (模型导入与路径修正)
+- 解决 `ollama create` 报错：之前命令写为 `-f Modelfile`，但文件实际位于 `llm/` 下，导致找不到文件。正确命令为 `ollama create qwen2.5:7b -f llm/Modelfile`，成功导入模型。
+- 确认所有模块路径：Web 应用需使用 `streamlit run web/app.py`，聊天页面为 `streamlit run web/chat_web.py`，AI 伴侣为 `streamlit run companion/companion_app.py`。
+- 修正 `llm/README.md` 中的命令，明确说明 `Modelfile` 的路径，避免后续重复踩坑。
+- 测试 `ollama run qwen2.5:7b` 成功，模型正常对话。
